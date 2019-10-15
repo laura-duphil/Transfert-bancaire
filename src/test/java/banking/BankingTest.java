@@ -64,6 +64,37 @@ public class BankingTest {
 		assertEquals("Balance incorrecte !", before1 + amount, myDAO.balanceForCustomer(toCustomer), 0.001f);				
 	}
 	
+	@Test(expected = IllegalArgumentException.class)
+	public void negativeTransfer() throws Exception {
+		float amount = 150.0f; //100-150 <0 -> Impossible
+		int fromCustomer = 0; // Le client 0 dispose de 100€ dans le jeu de tests
+		int toCustomer = 1;
+		// On mémorise les balances dans les deux comptes avant la transaction
+		float before0 = myDAO.balanceForCustomer(fromCustomer);
+		float before1 = myDAO.balanceForCustomer(toCustomer);
+		// On exécute la transaction, qui doit réussir
+		myDAO.bankTransferTransaction(fromCustomer, toCustomer, amount);
+		// Les balances doivent avoir été mises à jour dans les 2 comptes
+		assertEquals("Balance incorrecte !", before0 - amount, myDAO.balanceForCustomer(fromCustomer), 0.001f);
+		assertEquals("Balance incorrecte !", before1 + amount, myDAO.balanceForCustomer(toCustomer), 0.001f);				
+	}
+        
+        
+	@Test(expected = IllegalArgumentException.class)
+	public void idInconnuTransfer() throws Exception {
+		float amount = 10.0f;
+		int fromCustomer = 0; // Le client 0 dispose de 100€ dans le jeu de tests
+		int toCustomer = 3; // Client inconnu -> Impossible
+		// On mémorise les balances dans les deux comptes avant la transaction
+		float before0 = myDAO.balanceForCustomer(fromCustomer);
+		float before1 = myDAO.balanceForCustomer(toCustomer);
+		// On exécute la transaction, qui doit réussir
+		myDAO.bankTransferTransaction(fromCustomer, toCustomer, amount);
+		// Les balances doivent avoir été mises à jour dans les 2 comptes
+		assertEquals("Balance incorrecte !", before0 - amount, myDAO.balanceForCustomer(fromCustomer), 0.001f);
+		assertEquals("Balance incorrecte !", before1 + amount, myDAO.balanceForCustomer(toCustomer), 0.001f);				
+	}
+        
 
 	public static DataSource getDataSource() throws SQLException {
 		org.hsqldb.jdbc.JDBCDataSource ds = new org.hsqldb.jdbc.JDBCDataSource();
